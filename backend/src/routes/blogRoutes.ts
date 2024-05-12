@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { decode, sign, verify } from 'hono/jwt';
+import { verify } from 'hono/jwt';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
 
@@ -16,9 +16,8 @@ const blogRoutes = new Hono<{
 
 blogRoutes.use('/*', async (c, next) => {
 
-  const authHeader = c.req.header("authorization") || "";
-  const token = authHeader.split(" ")[1]
-  const user = await verify(token, c.env.JWT_SECRET);
+  const authHeader = c.req.header("Authorization") || "";
+  const user = await verify(authHeader, c.env.JWT_SECRET);
   if (user) {
     c.set("userId", user.id);
     await next()
@@ -28,7 +27,10 @@ blogRoutes.use('/*', async (c, next) => {
   }
 })
 
+
+
 blogRoutes.post('/', async (c) => {
+
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate())
@@ -37,18 +39,27 @@ blogRoutes.post('/', async (c) => {
   const body = await c.req.json()
   const authorId = Number(c.get("userId"))
 
-  const blog = await prisma.post.create({
-    data: {
-      title: body.title,
-      content: body.content,
-      authorId: authorId
-    }
-  })
+  try{
+    const blog = await prisma.post.create({
+      data: {
+        title: body.title,
+        content: body.content,
+        authorId: authorId
+      }
+    })
+  
+  
+    return c.json({
+      id: blog.id
+    })
+  }catch(err){
+    c.status(403)
+    return c.json({
+      message:"Some error occured"
+    })
+  }
 
-
-  return c.json({
-    id: blog.id
-  })
+  
 
 })
 
@@ -78,7 +89,24 @@ blogRoutes.put('/blog', async (c) => {
 
 })
 
-blogRoutes.get('/blog/:id', async (c) => {
+// Add pagination
+blogRoutes.get('/bulk', async (c) => {
+
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate())
+
+  const blogs = await prisma.post.findMany()
+  console.log(blogs)
+
+  return c.json({
+    blogs
+  })
+ 
+
+})
+
+blogRoutes.get('/:id', async (c) => {
 
 
   const prisma = new PrismaClient({
@@ -86,12 +114,12 @@ blogRoutes.get('/blog/:id', async (c) => {
   }).$extends(withAccelerate())
 
 
-  const body = await c.req.json()
+  const id= c.req.param("id")
 try{
   
   const blog = await prisma.post.findFirst({
     where: {
-      id: body.id
+      id: Number(id)
     }
   })
 
@@ -109,20 +137,7 @@ try{
 
 })
 
-// Add pagination
-blogRoutes.get('/blog/bulk', async (c) => {
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
-
-  const blogs = await prisma.post.findMany()
-
-  return c.json({
-    blogs
-  })
- 
-
-})
 
 
-export default blogRoutes
+
+export default blogRoutes;
