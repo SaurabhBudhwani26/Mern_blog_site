@@ -4,7 +4,10 @@
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
-    "hono": "^4.2.7"
+    "@100xdevs/medium-common": "^1.0.0",
+    "@sb2611/blog-common": "^1.0.0",
+    "hono": "^4.2.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240403.0",
