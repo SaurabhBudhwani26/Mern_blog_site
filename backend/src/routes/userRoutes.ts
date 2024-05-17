@@ -41,7 +41,8 @@ userRoutes.post('/signup', async (c) => {
   
       const token = await sign({ id: user.id }, c.env.JWT_SECRET)
   
-      return c.json({ jwt: token })
+      return c.text(token)
+
     } catch (e) {
       c.status(411)
       return c.text("User already exists with this email")
@@ -78,9 +79,9 @@ userRoutes.post('/signin', async (c) => {
       return c.json({ error: "Invalid credentials" })
     }
   
-    const jwt = await sign({ id: user.id }, c.env.JWT_SECRET)
+    const token = await sign({ id: user.id }, c.env.JWT_SECRET)
   
-    return c.json({ jwt: jwt })
+    return c.text(token)
   
     } catch(e){
       c.status(411)
