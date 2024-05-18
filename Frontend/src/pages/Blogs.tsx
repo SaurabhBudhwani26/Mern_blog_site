@@ -5,12 +5,12 @@ import { useBlogs } from "../hooks";
 export const Blogs = () => {
     const {loading, blogs} = useBlogs();
 
-    // if(loading){
+    if(loading){
 
-    //     return <div>
-    //         loading...
-    //     </div> 
-    // }
+        return <div>
+            loading...
+        </div> 
+    }
 
     return (
         <div>
