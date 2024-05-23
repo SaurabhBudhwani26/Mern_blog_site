@@ -1,9 +1,8 @@
 import { useParams } from "react-router-dom"
 import { ExpandBlog } from "../components/ExpandBlog"
 import { useBlog } from "../hooks"
-import { Skeleton } from "../components/Skeleton"
-import { Spinner } from "../components/Spinner"
 import { Appbar } from "../components/Appbar"
+import { BlogSkeleton } from "../components/BlogSkeleton"
 
 export const Blog = ()=>{
 
@@ -17,12 +16,8 @@ export const Blog = ()=>{
         return(
             <div>
                 <Appbar/>
-            <div className="h-screen flex flex-col justify-center">
-                <div className="flex justify-center">
-                    <Spinner/>
-                </div>
+                <BlogSkeleton/>
 
-            </div>
             </div>
         )
     }
