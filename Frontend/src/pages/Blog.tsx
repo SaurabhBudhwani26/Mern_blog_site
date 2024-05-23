@@ -1,6 +1,9 @@
 import { useParams } from "react-router-dom"
 import { ExpandBlog } from "../components/ExpandBlog"
 import { useBlog } from "../hooks"
+import { Skeleton } from "../components/Skeleton"
+import { Spinner } from "../components/Spinner"
+import { Appbar } from "../components/Appbar"
 
 export const Blog = ()=>{
 
@@ -11,7 +14,17 @@ export const Blog = ()=>{
     })
 
     if(loading){
-        return <div>Loading...</div>
+        return(
+            <div>
+                <Appbar/>
+            <div className="h-screen flex flex-col justify-center">
+                <div className="flex justify-center">
+                    <Spinner/>
+                </div>
+
+            </div>
+            </div>
+        )
     }
 
     return (
